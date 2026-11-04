@@ -11,26 +11,51 @@ the governance bounds. That division is the compile step.
 from __future__ import annotations
 
 import json
+import sys
 
 from . import mining
 
 
 def compile_aop(sop_hypothesis: dict, cases: list[dict], manifest: dict, version: str) -> dict:
-    variants_mined = mining.mine_variants(cases)
+    ratifications = manifest.get("rule_ratifications", {})
+    support_floor = manifest.get("minimum_support")
+    confidence_floor = manifest.get("confidence_floor", 0.0)
+    variants_mined = mining.mine_variants(cases, critical_actions=manifest.get("critical_variants"))
     rules = mining.extract_decision_rules(cases, manifest["authority_map"])
     exceptions_mined = mining.mine_exceptions(cases)
     loops_mined = mining.mine_rework_loops(cases)
 
     variants = []
     for index, v in enumerate(variants_mined, start=1):
+        # NM-PRV-6: the variant inherits the lowest stitching confidence among
+        # its cases (absent confidence means key-stitched, treated as 1.0).
+        stitching_confidence = min(
+            (c.get("stitching_confidence", 1.0) for c in cases if c["case_id"] in v["case_ids"]),
+            default=1.0,
+        )
+        below_support = support_floor is not None and v["observed_cases"] < support_floor
+        if below_support:
+            print("compile: variant %s below the support floor (%d < %s); its rules cannot be ratified"
+                  % (v["trigger"][:40], v["observed_cases"], support_floor), file=sys.stderr)
         # Reference implementation: every mined rule is evaluated on every
         # variant path; the guardrail re-checks authority at run time.
         variant_rules = []
         for r in rules:
+            # NM-AUT-7: ratification comes from the manifest by exact
+            # condition. A rule below the support floor or below the
+            # confidence floor cannot be ratified, whatever the manifest says.
+            requested = bool(ratifications.get(r["if"]))
+            if requested and not below_support and stitching_confidence >= confidence_floor:
+                status = "ratified"
+            elif requested and stitching_confidence < confidence_floor:
+                status = "reviewed"  # capped: low-confidence corpus cannot carry ratification (NM-PRV-6)
+            else:
+                status = "observed"
             rule = {
                 "if": r["if"],
                 "then": r["then"],
                 "authority": r["authority"],
+                "status": status,
                 "provenance": {
                     "observed_cases": r["observed_cases"],
                     "path_frequency": v["frequency"],
@@ -46,6 +71,7 @@ def compile_aop(sop_hypothesis: dict, cases: list[dict], manifest: dict, version
                 "if": "true",
                 "then": "proceed under the variant plan",
                 "authority": manifest.get("default_authority_class", "prohibited"),
+                "status": "ratified" if (ratifications.get("true") and not below_support and stitching_confidence >= confidence_floor) else "observed",
                 "provenance": {
                     "observed_cases": v["observed_cases"],
                     "path_frequency": v["frequency"],
@@ -63,6 +89,7 @@ def compile_aop(sop_hypothesis: dict, cases: list[dict], manifest: dict, version
                 "path_frequency": v["frequency"],
             },
         })
+        variants[-1]["provenance"]["stitching_confidence"] = round(stitching_confidence, 3)
 
     doc = {
         "aop": manifest["aop"],
@@ -120,6 +147,26 @@ def compile_aop(sop_hypothesis: dict, cases: list[dict], manifest: dict, version
     }
     if manifest.get("process_alignment"):
         doc["process_alignment"] = manifest["process_alignment"]
+    if manifest.get("accountable_owner"):
+        doc["governance"]["accountable_owner"] = manifest["accountable_owner"]
+    if manifest.get("prepared_by"):
+        doc["governance"]["prepared_by"] = manifest["prepared_by"]
+    if manifest.get("ratified_by"):
+        doc["governance"]["ratified_by"] = manifest["ratified_by"]
+
+    # Policy-conflict flagging: where the SOP claimed an authority hint and
+    # the manifest assigns a different class for the same decision family,
+    # the conflict is recorded, and the involved rules stay unratified until
+    # the owner resolves it.
+    conflicts = []
+    claimed = {c.get("if", "").strip(): c.get("authority_hint") for c in sop_hypothesis.get("claimed_decision_rules", []) if c.get("if")}
+    for condition, hint in claimed.items():
+        for r in rules:
+            if r["if"].strip() == condition.strip() and hint and hint != r["authority"]:
+                conflicts.append({"condition": condition, "sop_claimed": hint, "manifest_assigned": r["authority"]})
+    if conflicts:
+        doc["provenance"]["policy_conflicts"] = conflicts
+        print("compile: %d policy conflict(s) between the SOP claims and the manifest" % len(conflicts), file=sys.stderr)
     return doc
 
 

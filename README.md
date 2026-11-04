@@ -7,7 +7,7 @@
 | Authority | The toolchain: parsing, mining, extraction, compilation, linting |
 | Tier | Tooling |
 | Landing wave | 4 |
-| Version | 0.1.1 |
+| Version | 0.2.0 |
 | Status | Stable |
 | Licence | MIT |
 

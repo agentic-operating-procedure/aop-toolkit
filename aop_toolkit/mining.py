@@ -48,7 +48,7 @@ def case_decisions(case: dict) -> list[dict]:
     return out
 
 
-def mine_variants(cases: list[dict], min_frequency: float = 0.05) -> list[dict]:
+def mine_variants(cases: list[dict], min_frequency: float = 0.05, critical_actions: list[str] | None = None) -> list[dict]:
     """Group cases by their ordered action signature; emit variants with
     frequencies, discriminating triggers, and provenance."""
     groups: dict[tuple, list[dict]] = defaultdict(list)
@@ -58,7 +58,10 @@ def mine_variants(cases: list[dict], min_frequency: float = 0.05) -> list[dict]:
     variants = []
     for signature, members in sorted(groups.items(), key=lambda kv: -len(kv[1])):
         frequency = len(members) / total
-        if frequency < min_frequency and len(groups) > 1:
+        is_critical = critical_actions and any(a in critical_actions for a in signature)
+        if frequency < min_frequency and len(groups) > 1 and not is_critical:
+            # Rare-but-critical variants are exempt from frequency pruning
+            # (NM-STR-19); they still need ratification like any other.
             continue
         trigger = _discriminating_trigger(members, cases)
         variants.append({
