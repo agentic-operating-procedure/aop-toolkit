@@ -115,13 +115,13 @@ def extract_decision_rules(cases: list[dict], authority_map: dict[str, str]) -> 
     groups: dict[str, list[dict]] = defaultdict(list)
     for case in cases:
         for decision in case_decisions(case):
-            m = THRESHOLD_RE.search(decision["condition"])
-            if m:
-                key = "%s %s %s" % (m.group(1), m.group(2), m.group(3))
-                family = m.group(1)
-            else:
-                key = decision["condition"].strip()
-                family = key.split()[0] if key.split() else key
+            # The observed condition is kept verbatim: truncating a compound
+            # condition to its first numeric comparison would drop the rest of
+            # the guard (for example, "degradation > 30 AND outage" losing the
+            # outage half) and could widen authority by accident.
+            key = decision["condition"].strip()
+            m = THRESHOLD_RE.search(key)
+            family = m.group(1) if m else (key.split()[0] if key.split() else key)
             groups[key].append({**decision, "family": family})
 
     rules = []

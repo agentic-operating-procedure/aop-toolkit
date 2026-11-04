@@ -4,6 +4,13 @@ All notable changes to this repository are documented here. Format follows [Keep
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-04
+
+### Fixed
+
+- The decision-rule extractor keeps observed conditions verbatim. Truncating a compound condition (for example, degradation above threshold AND active outage) to its first numeric comparison dropped the rest of the guard and could let the rule fall through to prohibited with a truncated condition. Found by the 5G exemplar chain; the fault management chain was re-run unchanged.
+
+
 ## [0.1.0] - 2026-11-04
 
 ### Reference toolchain
@@ -15,5 +22,6 @@ All notable changes to this repository are documented here. Format follows [Keep
 - Published the linter: schema and semantic validation reusing the shared `aop-spec` reference validator, plus toolkit lints for identifier hygiene and permitted-set coverage.
 - Published the CLI and the fixture chain: source SOP, 40-case observed corpus, governance manifest, and the compiled fixture AOP that lints clean.
 
-[Unreleased]: https://github.com/agentic-operating-procedure/aop-toolkit/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/agentic-operating-procedure/aop-toolkit/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/agentic-operating-procedure/aop-toolkit/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/agentic-operating-procedure/aop-toolkit/releases/tag/v0.1.0

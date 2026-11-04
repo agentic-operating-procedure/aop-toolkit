@@ -22,7 +22,7 @@ The reference miner is deliberately simple, and its limits are stated so nobody 
 
 - **Variants are action-signature groups.** Two cases with the same ordered action sequence are the same variant, whatever their context. Context that differentiates work with the same shape (for example, who authorised the dispatch) is invisible to this miner. The trigger heuristic therefore reports a residual pattern for the dominant variant when no context attribute separates it purely.
 - **Triggers come from the highest-purity separating context attribute.** The heuristic looks for a single attribute value present in every case of the variant and no case outside it. It is a reference heuristic, not the method `aop-evaluation` will measure.
-- **Thresholds are majority-voted from observed decision strings.** Where humans decided with different thresholds, the most frequent observed value wins and the spread is retained in `observed_thresholds`. A wide spread is itself signal: it usually means two populations were mined as one.
+- **Observed conditions are kept verbatim.** The observed decision string is the compiled rule condition, exactly as recorded: truncating a compound condition to its first numeric comparison would drop the rest of the guard and could widen authority by accident. A wide spread of distinct conditions over one variable is itself signal: it usually means two populations were mined as one.
 - **Authority never comes from observation.** The authority class per decision family is read from the governance manifest. Unmapped families land as `prohibited`, which is the fail-closed direction.
 - **Rework loops are observed repeats.** The bound is the observed maximum. The compile cannot see loops that observation did not survive to repeat.
 
