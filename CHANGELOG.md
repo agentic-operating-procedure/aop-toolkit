@@ -4,6 +4,13 @@ All notable changes to this repository are documented here. Format follows [Keep
 
 ## [Unreleased]
 
+## [v0.3.0] - 2026-11-05
+
+### Added (Wave H3: CR-021)
+
+- The build attestation: every compiled AOP carries the compiler version, builder identity, and the input digests (SOP, corpus, manifest) per NM-VER-7.
+
+
 ## [0.2.0] - 2026-11-05
 
 ### Added (CR-009 block 1)
@@ -44,7 +51,8 @@ All notable changes to this repository are documented here. Format follows [Keep
 - Published the linter: schema and semantic validation reusing the shared `aop-spec` reference validator, plus toolkit lints for identifier hygiene and permitted-set coverage.
 - Published the CLI and the fixture chain: source SOP, 40-case observed corpus, governance manifest, and the compiled fixture AOP that lints clean.
 
-[Unreleased]: https://github.com/agentic-operating-procedure/aop-toolkit/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/agentic-operating-procedure/aop-toolkit/compare/v0.3.0...HEAD
+[v0.3.0]: https://github.com/agentic-operating-procedure/aop-toolkit/compare/v0.2.0...v0.3.0
 [v0.2.0]: https://github.com/agentic-operating-procedure/aop-toolkit/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/agentic-operating-procedure/aop-toolkit/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/agentic-operating-procedure/aop-toolkit/releases/tag/v0.1.0
