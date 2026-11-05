@@ -63,9 +63,16 @@ def main(argv=None):
         return 0
 
     if args.command == "compile":
+        import hashlib
         sop = parse_sop(open(args.sop).read())
         cases = mining.load_cases(args.cases)
         manifest = json.load(open(args.manifest))
+        # NM-VER-7: the input digests travel into the build attestation.
+        manifest["_input_digests"] = {
+            "sop": "sha256:" + hashlib.sha256(open(args.sop, 'rb').read()).hexdigest(),
+            "cases": "sha256:" + hashlib.sha256(open(args.cases, 'rb').read()).hexdigest(),
+            "manifest": "sha256:" + hashlib.sha256(open(args.manifest, 'rb').read()).hexdigest(),
+        }
         doc = compiler.compile_aop(sop, cases, manifest, args.version)
         compiler.write_aop(doc, args.out)
         print("compiled %s %s to %s" % (doc["aop"], doc["version"], args.out), file=sys.stderr)

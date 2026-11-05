@@ -6,4 +6,4 @@ The schema compiled to is owned by aop-spec; the graph mined from is owned
 by aop-context-graph. Standard library only.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.3.0"

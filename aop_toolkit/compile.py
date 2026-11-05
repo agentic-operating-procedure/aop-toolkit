@@ -145,6 +145,18 @@ def compile_aop(sop_hypothesis: dict, cases: list[dict], manifest: dict, version
         },
         "governance": {"audit": "case-record"},
     }
+    # NM-VER-7: the build attestation binds the compiled artefact to its
+    # inputs, builder and toolchain. The signing scheme is a deployment
+    # obligation; the reference records digest attestations.
+    import hashlib
+    def _digest_file(path):
+        return "sha256:" + hashlib.sha256(open(path, 'rb').read()).hexdigest() if path else None
+    doc["build_attestation"] = {
+        "compiler": "aop-toolkit %s" % _toolkit_version(),
+        "builder": manifest.get("prepared_by", "unattributed"),
+        "inputs": manifest.get("_input_digests", {}),
+        "note": "digest attestation per ARC-TB2; the signing scheme is a deployment obligation",
+    }
     if manifest.get("process_alignment"):
         doc["process_alignment"] = manifest["process_alignment"]
     if manifest.get("accountable_owner"):
@@ -180,6 +192,11 @@ def _hypothesis_statement(sop: dict) -> str:
     if not claims:
         claims.append("claims a linear corridor of %d steps" % len(sop.get("claimed_steps", [])))
     return "The source procedure %s. Observation tests these claims." % "; ".join(claims)
+
+
+def _toolkit_version():
+    from . import __version__
+    return __version__
 
 
 def write_aop(doc: dict, path: str) -> None:
