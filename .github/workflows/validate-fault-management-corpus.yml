@@ -1,0 +1,14 @@
+name: validate-fault-management-corpus
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  corpus-validator-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run validator regression tests
+        run: python3 -m unittest discover -s tests -p 'test_*.py'

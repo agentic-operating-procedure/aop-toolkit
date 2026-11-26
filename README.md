@@ -38,7 +38,8 @@ fixtures/sop/rb-line-001.md                          the source SOP (v12)
 fixtures/cases/fault-management-cases.jsonl          40 observed cases, stitched
 fixtures/manifests/fault-management.json             the governance manifest
 
-python3 scripts/generate_cases.py                    regenerate the corpus
+python3 scripts/generate_cases.py
+python3 scripts/validate_case_cycle_time.py  # diagnostic; currently reports unresolved boundary/duration defects
 python3 -m aop_toolkit parse-sop fixtures/sop/rb-line-001.md
 python3 -m aop_toolkit mine fixtures/cases/fault-management-cases.jsonl --authority-map <json>
 python3 -m aop_toolkit compile --sop ... --cases ... --manifest ... --version v0.1.0 --out aop.json
@@ -52,3 +53,8 @@ The compiled fixture AOP carries a `process_alignment` block with declared gaps 
 | Document | Scope |
 |---|---|
 | [The reference toolchain](./docs/aop-reference-toolchain-toolkit-scope.md) | Pipeline stage mapping, the mining heuristics and their limits, and the compile contract |
+
+
+### Fault-management corpus integrity
+
+The cycle-time validator checks timezone-aware case boundaries, non-negative elapsed duration, and declared cycle-time consistency. The current source corpus contains unresolved boundary and duration defects; running the validator is diagnostic and is expected to report these until the fixture is reconciled. CI currently runs regression tests for the validator itself and does not treat the unreconciled source corpus as passing.

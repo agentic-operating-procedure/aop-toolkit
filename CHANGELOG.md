@@ -4,6 +4,9 @@ All notable changes to this repository are documented here. Format follows [Keep
 
 ## [Unreleased]
 
+### Fixed
+- CR-041: Add a diagnostic cycle-time validator and regression tests; preserve source fixture pending boundary adjudication.
+
 ## [0.3.0] - 2026-11-05
 
 ### Added (Wave H3: CR-021)
