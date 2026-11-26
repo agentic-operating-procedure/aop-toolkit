@@ -1,0 +1,16 @@
+name: validate-fault-management-corpus
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  corpus:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate declared cycle times
+        run: python3 scripts/validate_case_cycle_time.py
+      - name: Run validator regression tests
+        run: python3 -m unittest tests/test_cycle_time_validation.py
