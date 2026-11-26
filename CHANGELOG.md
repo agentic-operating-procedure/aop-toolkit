@@ -5,7 +5,7 @@ All notable changes to this repository are documented here. Format follows [Keep
 ## [Unreleased]
 
 ### Fixed
-- CR-041: Correct fault-management case cycle-time declarations to the existing case-schema definition and add deterministic validation.
+- CR-041: Add a diagnostic cycle-time validator and regression tests; preserve source fixture pending boundary adjudication.
 
 ## [0.3.0] - 2026-11-05
 
