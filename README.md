@@ -38,7 +38,8 @@ fixtures/sop/rb-line-001.md                          the source SOP (v12)
 fixtures/cases/fault-management-cases.jsonl          40 observed cases, stitched
 fixtures/manifests/fault-management.json             the governance manifest
 
-python3 scripts/generate_cases.py                    regenerate the corpus
+python3 scripts/generate_cases.py
+python3 scripts/validate_case_cycle_time.py  # validate cycle_time against started_at/ended_at                    regenerate the corpus
 python3 -m aop_toolkit parse-sop fixtures/sop/rb-line-001.md
 python3 -m aop_toolkit mine fixtures/cases/fault-management-cases.jsonl --authority-map <json>
 python3 -m aop_toolkit compile --sop ... --cases ... --manifest ... --version v0.1.0 --out aop.json
