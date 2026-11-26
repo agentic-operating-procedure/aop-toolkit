@@ -12,13 +12,15 @@ Usage: python3 scripts/generate_cases.py [--out fixtures/cases/fault-management-
 import argparse
 import json
 import random
+from datetime import datetime, timedelta, timezone
 
 random.seed(20261104)
 
 
 def make_case(index, profile):
     case_id = "FM-2026-11-%04d" % index
-    started = "2026-11-02T%02d:%02dZ" % (8 + index % 8, index % 60)
+    started_dt = datetime(2026, 11, 2, 8 + index % 8, index % 60, tzinfo=timezone.utc)
+    started = started_dt.strftime("%Y-%m-%dT%H:%MZ")
     steps = []
     decisions = []
 
@@ -100,7 +102,7 @@ def make_case(index, profile):
         "case_id": case_id,
         "procedure": "fault-management",
         "started_at": started,
-        "ended_at": "2026-11-02T%02d:%02dZ" % (8 + index % 8, (index % 60 + cycle % 60) % 60),
+        "ended_at": (started_dt + timedelta(minutes=cycle)).strftime("%Y-%m-%dT%H:%MZ"),
         "process_ref": None,
         "tasks": [{"name": "diagnose-and-restore", "steps": steps}],
         "actor_roles": sorted({s["actor_role"] for s in steps}),
