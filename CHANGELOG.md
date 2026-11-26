@@ -4,6 +4,9 @@ All notable changes to this repository are documented here. Format follows [Keep
 
 ## [Unreleased]
 
+### Fixed
+- CR-041: Correct fault-management case cycle-time declarations to the existing case-schema definition and add deterministic validation.
+
 ## [0.3.0] - 2026-11-05
 
 ### Added (Wave H3: CR-021)
