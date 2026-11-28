@@ -39,6 +39,10 @@ def main(argv=None):
     p.add_argument("--version", required=True)
     p.add_argument("--out", required=True)
 
+    p = sub.add_parser("validate-corpus", help="validate corpus timing and integrity invariants (CV-1 to CV-4)")
+    p.add_argument("cases")
+    p.add_argument("--max-report", type=int, default=12)
+
     p = sub.add_parser("lint", help="lint a compiled AOP")
     p.add_argument("aop")
     p.add_argument("--spec-home", default=None, help="path to aop-spec (default: sibling checkout)")
@@ -77,6 +81,10 @@ def main(argv=None):
         compiler.write_aop(doc, args.out)
         print("compiled %s %s to %s" % (doc["aop"], doc["version"], args.out), file=sys.stderr)
         return 0
+
+    if args.command == "validate-corpus":
+        from .validate_corpus import main as vc_main
+        return vc_main([args.cases, "--max-report", str(args.max_report)])
 
     if args.command == "lint":
         ok, errors = linter.lint(args.aop, args.spec_home)
