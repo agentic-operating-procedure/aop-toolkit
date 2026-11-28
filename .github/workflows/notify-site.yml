@@ -1,0 +1,21 @@
+name: notify-site
+
+# CR-040: every estate push tells the site to re-sync. The site's
+# sync-estate workflow pulls this repo's artefacts on the dispatch.
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify the site repository
+        run: |
+          curl -fsSL -X POST \
+            -H "Authorization: Bearer ${{ secrets.SITE_DISPATCH_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/agentic-operating-procedure/site/dispatches \
+            -d '{"event_type":"estate-push","client_payload":{"repo":"${{ github.repository }}","sha":"${{ github.sha }}"}}' \
+            || echo "dispatch failed (non-blocking; the schedule catches up)"
